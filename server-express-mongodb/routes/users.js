@@ -138,9 +138,12 @@ router.post('/addtocart', async function(req, res, next){
               cart.products.push(newProduct);
           }
           else {
+            var indexOfItem = cart.products.findIndex((i) => i.productId === newProduct.productId);
             var newProductArray = cart.products.filter(p => p.productId !== newProduct.productId);
             item.quantity += newProduct.quantity;
-            newProductArray.push(item)
+            // newProductArray.push(item)
+            newProductArray = [...newProductArray];
+            newProductArray.splice(indexOfItem, 0, item);
             cart.products = newProductArray;
           }
           cart.save((err, updateCart) => {
@@ -165,7 +168,12 @@ router.get('/cart', async function(req, res, next){
   let user = await authService.verifyUser(token);
     if (user){
       var totalPrice =0;
-      let cart = (await CartModel.findOne({userId: user.id}).exec()).toObject();
+      var cart = (await CartModel.findOne({userId: user.id}).exec());
+      if (!cart){
+        let c = await CartModel.findOneAndUpdate({userId: user.id}, {products:[]}, {upsert: true, new: true});
+        return res.json(c);
+      }
+      cart = cart.toObject();
       const productIds = cart.products.map(product => product.productId);
       let products = await ProductsModel.find().where('_id').in(productIds).exec();
       var productItems = cart.products.map(p => {
@@ -205,10 +213,14 @@ router.post('/removefromcart', async function(req, res, next){
             return res.status(403).send("Error removing item from cart");
         }
         else {
+          var indexOfItem = cart.products.findIndex((i) => i.productId === removeProduct.productId);
+          console.log('index to remove',indexOfItem);
           var newProductArray = cart.products.filter(p => p.productId !== removeProduct.productId);
           item.quantity -= removeProduct.quantity;
           if (item.quantity > 0){
-            newProductArray.push(item)
+            // newProductArray.push(item)
+            newProductArray = [...newProductArray];
+            newProductArray.splice(indexOfItem, 0, item);
           }
           cart.products = newProductArray;
         }

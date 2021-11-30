@@ -75,17 +75,18 @@ export default function HomePage() {
           ))}
         </Carousel>
       )}
+      <hr className="solid text-white"/>
 
       <img
-        className="d-block w-100"
+        className="d-block w-100 m-3"
         src={newitems}
         style={{
           objectFit: "contain",
           width: ".5em",
           height: "15em",
-          marginBottom: "3em",
         }}
       />
+      <hr className="solid text-white"/>
       <br />
 
       <Row className="justify-content-center mx-auto gy-4 gx-4">
@@ -109,11 +110,6 @@ export default function HomePage() {
                 <Card.Title>{product.title}</Card.Title>
                 <Card.Text>{product.desc}</Card.Text>
                 <Card.Text>{getReadablePrice(product.price)}</Card.Text>
-              </Card.Body>
-
-              <Card.Body>
-                <Card.Link href="#">Add to Cart</Card.Link>
-                <Card.Link href="#">Buy</Card.Link>
               </Card.Body>
             </Card>
           ))}
